@@ -34,11 +34,11 @@ class mainWindow(QMainWindow):
         #Agregamos un boton para iniciar el temporizador
         self.boton1 = QPushButton("Iniciar")
         self.boton1.clicked.connect(self.screen1)
-        self.boton1.clicked.connect(self.Encender)
+        self.boton1.clicked.connect(self.iniciar)
         principalLayout.addWidget(self.boton1)
 
-        #self.timer = QTimer()
-        #self.timer.timeout.connect(self.Encender)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.Encender)
     
     def screen1(self):
         contenedor = QWidget()
@@ -58,12 +58,22 @@ class mainWindow(QMainWindow):
     ###############PARTE LOGICA###############
   
     def iniciar(self):
+        valor = self.ingresar.text()
+        minutos, segundos = map(int, valor.split(":"))
+        self.segundos = minutos * 60 + segundos
+        self.label0.setText(f"{minutos:02}:{segundos:02}")
         if not self.timer.isActive():
             self.timer.start(1000)
 
     def Encender(self):
-        valor = self.ingresar.text()
-        print(valor)
+        if self.segundos > 0:
+            self.segundos -= 1
+            minutes = self.segundos // 60
+            seconds = self.segundos % 60
+            self.label0.setText(f"{minutes:02}:{seconds:02}")
+        else:
+            self.timer.stop()
+            self.screen0()
 
     def Detener(self):
         if self.timer.isActive():
