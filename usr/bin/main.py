@@ -27,11 +27,27 @@ class mainWindow(QMainWindow):
         principalLayout = QVBoxLayout(contenedor)
         self.setLayout(principalLayout)
 
+        #Creamos un QHBoxLayout para ingresar los datos
+        self.ingresaQline = QHBoxLayout()
+
         #Agregamos un QlineEdit para ingresar el tiempo
-        self.ingresar = QLineEdit()
-        self.ingresar.setPlaceholderText("00:00")
-        self.ingresar.setStyleSheet("color: white;")
-        principalLayout.addWidget(self.ingresar)
+        self.ingresar1 = QLineEdit()
+        self.ingresar1.setPlaceholderText("Tiempo de trabajo: 00:00")
+        self.ingresar1.setStyleSheet("color: white;")
+        #Agregamos un QlineEdit para ingresar el descanso
+        self.ingresar2 = QLineEdit()
+        self.ingresar2.setPlaceholderText("Descanso (00:00)")
+        self.ingresar2.setStyleSheet("color: white;")
+        #Agregamos un QlineEdit para ingresar la cantidad de veces que se repetira el temporizador
+        self.ingresar3 = QLineEdit()
+        self.ingresar3.setPlaceholderText("Veces a repetir (4)")
+        self.ingresar3.setStyleSheet("color: white;")
+
+        #Agregamos con un for los QlineEdit al layout no tener tantas lineas de codigo
+        for ingresar in (self.ingresar1, self.ingresar2, self.ingresar3):
+            self.ingresaQline.addWidget(ingresar)
+
+        principalLayout.addLayout(self.ingresaQline)
 
         #Agregamos un boton para iniciar el temporizador que llama a la segunda pantalla y tambien a la funcion iniciar
         self.boton0 = QPushButton("Iniciar")
@@ -68,8 +84,9 @@ class mainWindow(QMainWindow):
         self.boton2.clicked.connect(self.screen0)
 
         #for para agilizar agregar los botones al layout
-        self.botonLayout.addWidget(self.boton1)
-        self.botonLayout.addWidget(self.boton2)
+        for boton in (self.boton1, self.boton2):
+            boton.setStyleSheet("color: white;")
+            self.botonLayout.addWidget(boton)
 
         self.layout.addLayout(self.botonLayout)
 
@@ -78,7 +95,7 @@ class mainWindow(QMainWindow):
   
     #Extremos el tiempo ingresado en el QlineEdit y lo convertimos a segundos
     def iniciar(self):
-        valor = self.ingresar.text()
+        valor = self.ingresar1.text()
         #Lo separamos en minutos y segundos
         minutos, segundos = map(int, valor.split(":"))
         #Convertimos los minutos a segundos y sumamos los segundos
