@@ -1,23 +1,19 @@
-from PySide6.QtWidgets import QApplication,QVBoxLayout, QPushButton, QMainWindow, QHBoxLayout, QWidget, QLabel, QLineEdit
+from PySide6.QtWidgets import QApplication, QVBoxLayout, QPushButton, QMainWindow, QHBoxLayout, QWidget, QLabel, QLineEdit
 from PySide6.QtCore import QSize, QTimer, Qt 
 import sys 
 
-
-#Creamos la clase ventana
+# Creamos la clase ventana
 class mainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        #El titulo y tamaño y coordenadas donde aparecera la ventana
         self.setWindowTitle("Timer type pomodoro")
         self.setGeometry(100, 100, 1000, 650)
-
         self.screen0()
 
     ###########################################
-    ###############PANTALLAS###################
+    ############### PANTALLAS #################
 
-    #Pantalla 1 la que sale al iniciar el programa
-    #Pantalla donde se ingresa el tiempo y se inicia el temporizador
+    # Pantalla 1: donde se ingresa el tiempo y se inicia el temporizador
     def screen0(self):
         contenedor = QWidget()
         self.setCentralWidget(contenedor)
@@ -25,40 +21,39 @@ class mainWindow(QMainWindow):
         principalLayout = QVBoxLayout(contenedor)
         self.setLayout(principalLayout)
 
-        #Creamos un QHBoxLayout para ingresar los datos
+        # Creamos un QHBoxLayout para ingresar los datos
         self.ingresaQline = QHBoxLayout()
 
-        #Agregamos un QlineEdit para ingresar el tiempo
+        # QLineEdit para ingresar el tiempo de trabajo
         self.ingresar1 = QLineEdit()
         self.ingresar1.setPlaceholderText("Tiempo de trabajo: 00:00")
         self.ingresar1.setStyleSheet("color: white;")
-        #Agregamos un QlineEdit para ingresar el descanso
+        # QLineEdit para ingresar el descanso
         self.ingresar2 = QLineEdit()
         self.ingresar2.setPlaceholderText("Descanso (00:00)")
         self.ingresar2.setStyleSheet("color: white;")
-        #Agregamos un QlineEdit para ingresar la cantidad de veces que se repetira el temporizador
+        # QLineEdit para ingresar la cantidad de repeticiones
         self.ingresar3 = QLineEdit()
         self.ingresar3.setPlaceholderText("Veces a repetir (4)")
         self.ingresar3.setStyleSheet("color: white;")
 
-        #Agregamos con un for los QlineEdit al layout no tener tantas lineas de codigo
+        # Agregamos los QLineEdit al layout
         for ingresar in (self.ingresar1, self.ingresar2, self.ingresar3):
             self.ingresaQline.addWidget(ingresar)
 
         principalLayout.addLayout(self.ingresaQline)
 
-        #Agregamos un boton para iniciar el temporizador que llama a la segunda pantalla y tambien a la funcion iniciar
+        # Botón para iniciar el temporizador
         self.boton0 = QPushButton("Iniciar")
         self.boton0.clicked.connect(self.screen1)
         self.boton0.clicked.connect(self.iniciar)
         principalLayout.addWidget(self.boton0)
 
-        #inicializamos el temporizador QTimer
+        # Inicializamos el temporizador QTimer
         self.timer = QTimer()
         self.timer.timeout.connect(self.Encender)
 
-
-    #Pantalla 2 la que sale cuando el temporizador llega a 0
+    # Pantalla 2: la que sale cuando el temporizador está corriendo
     def screen1(self):
         contenedor = QWidget()
         self.layout = QVBoxLayout(contenedor)
@@ -66,22 +61,21 @@ class mainWindow(QMainWindow):
         contenedor.setStyleSheet("background-color: #0e0f11")
         self.setLayout(self.layout)
 
-        #agregamos un label
+        # Label para mostrar el tiempo
         self.label0 = QLabel("00:00")
         self.label0.setStyleSheet("color:white;")
         self.layout.addWidget(self.label0)
 
-        #agregamos dos botones uno para detener y otra para volver a la pantalla 1
+        # Layout para los botones de control
         self.botonLayout = QHBoxLayout()
-        #Boton para detener el temporizador
+        # Botón para detener el temporizador
         self.boton1 = QPushButton("Detener")
         self.boton1.clicked.connect(self.Detener)
-
-        #Boton para volver a la pantalla 1
+        # Botón para volver a la pantalla 1
         self.boton2 = QPushButton("Volver")
         self.boton2.clicked.connect(self.screen0)
 
-        #for para agilizar agregar los botones al layout
+        # Agregamos los botones al layout
         for boton in (self.boton1, self.boton2):
             boton.setStyleSheet("color: white;")
             self.botonLayout.addWidget(boton)
@@ -89,42 +83,73 @@ class mainWindow(QMainWindow):
         self.layout.addLayout(self.botonLayout)
 
     ##########################################
-    ###############PARTE LOGICA###############
+    ############### PARTE LOGICA #############
   
-    #Extremos el tiempo ingresado en el QlineEdit y lo convertimos a segundos
+    # Inicia el temporizador y guarda los valores ingresados
     def iniciar(self):
-        valor = self.ingresar1.text()
-        #Lo separamos en minutos y segundos
-        minutos, segundos = map(int, valor.split(":"))
-        #Convertimos los minutos a segundos y sumamos los segundos
+        # Guardamos los valores ingresados antes de cambiar de pantalla
+        self.estadoTrabajo = self.ingresar1.text()
+        self.estadoDescanso = self.ingresar2.text()
+        try:
+            self.repeticiones = int(self.ingresar3.text())
+        except ValueError:
+            self.repeticiones = 1  # Valor por defecto si no es válido
+
+        self.estado = "Trabajo"  # Comenzamos en modo trabajo
+        self.repeticionesCO = 0  # Contador de ciclos completados
+
+        # Convertimos el tiempo de trabajo a segundos
+        minutos, segundos = map(int, self.estadoTrabajo.split(":"))
         self.segundos = minutos * 60 + segundos
         self.label0.setText(f"{minutos:02}:{segundos:02}")
+
         if not self.timer.isActive():
             self.timer.start(1000)
 
+    # Esta función se llama cada segundo por el QTimer
     def Encender(self):
-        #Verifica si segundos es mayor que 0
-        #Si es asi, resta 1 segundo y actualiza el label
         if self.segundos > 0:
+            # Si quedan segundos, restamos uno y actualizamos el label
             self.segundos -= 1
             minutes = self.segundos // 60
             seconds = self.segundos % 60
-            #Actualiza el label con el tiempo restante
             self.label0.setText(f"{minutes:02}:{seconds:02}")
         else:
-            #Si segundo es 0, se detiene el temporizador y se muestra la pantalla 1
-            self.timer.stop()
-            self.screen0()
+            # Cuando el temporizador llega a 0
+            if self.estado == "Trabajo":
+                # Cambiamos a descanso
+                self.estado = "Descanso"
+                try:
+                    minutos, segundos = map(int, self.estadoDescanso.split(":"))
+                except Exception:
+                    minutos, segundos = 0, 0
+                self.segundos = minutos * 60 + segundos
+                self.label0.setText(f"{minutos:02}:{segundos:02}")
+            elif self.estado == "Descanso":
+                # Terminó un ciclo completo (trabajo + descanso)
+                self.repeticionesCO += 1
+                if self.repeticionesCO >= self.repeticiones:
+                    # Si ya se completaron las repeticiones, detenemos el timer y volvemos a la pantalla inicial
+                    self.timer.stop()
+                    self.screen0()
+                    return
+                # Si no, volvemos a trabajo
+                self.estado = "Trabajo"
+                try:
+                    minutos, segundos = map(int, self.estadoTrabajo.split(":"))
+                except Exception:
+                    minutos, segundos = 0, 0
+                self.segundos = minutos * 60 + segundos
+                self.label0.setText(f"{minutos:02}:{segundos:02}")
 
+    # Detiene o reanuda el temporizador
     def Detener(self):
         if self.timer.isActive():
-           self.timer.stop()
+            self.timer.stop()
         else:
             self.timer.start(1000)
      
 app = QApplication(sys.argv)
-
 windows = mainWindow()
 windows.show()
-
 app.exec()
