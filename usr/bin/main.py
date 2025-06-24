@@ -13,8 +13,6 @@ class mainWindow(QMainWindow):
 
         self.screen0()
 
-        
-
     ###########################################
     ###############PANTALLAS###################
 
