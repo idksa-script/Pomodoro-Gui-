@@ -1,5 +1,6 @@
 from PySide6.QtWidgets import QApplication, QVBoxLayout, QPushButton, QMainWindow, QHBoxLayout, QWidget, QLabel, QLineEdit
-from PySide6.QtCore import QSize, QTimer, Qt 
+from PySide6.QtCore import QSize, QTimer, Qt, QUrl
+from PySide6.QtMultimedia import QSoundEffect
 import sys 
 
 # Creamos la clase ventana
@@ -9,6 +10,13 @@ class mainWindow(QMainWindow):
         self.setWindowTitle("Timer type pomodoro")
         self.setGeometry(100, 100, 1000, 650)
         self.screen0()
+
+        self.sonido0 = QSoundEffect()
+        self.sonido0.setSource(QUrl.fromLocalFile("/home/idksa_script/Codigo/Proyectos/Pomodoro/usr/bin/Sounds/772763__jerryberumen__user-interface-fanfare-end-reached-success-victory-finished.wav"))
+        self.sonido1 = QSoundEffect()
+        self.sonido1.setSource(QUrl.fromLocalFile("/home/idksa_script/Codigo/Proyectos/Pomodoro/usr/bin/Sounds/613876__theplax__digital-alarm-clock.wav"))
+        self.sonido0.setVolume(1.0)
+        self.sonido1.setVolume(1.0)
 
     ###########################################
     ############### PANTALLAS #################
@@ -117,6 +125,7 @@ class mainWindow(QMainWindow):
         else:
             # Cuando el temporizador llega a 0
             if self.estado == "Trabajo":
+                self.sonidoInicioDescanso()  # Reproducimos el sonido
                 # Cambiamos a descanso
                 self.estado = "Descanso"
                 try:
@@ -130,25 +139,33 @@ class mainWindow(QMainWindow):
                 self.repeticionesCO += 1
                 if self.repeticionesCO >= self.repeticiones:
                     # Si ya se completaron las repeticiones, detenemos el timer y volvemos a la pantalla inicial
+                    self.sonidoFinal()
                     self.timer.stop()
                     self.screen0()
                     return
                 # Si no, volvemos a trabajo
                 self.estado = "Trabajo"
+                self.sonidoInicioDescanso()
                 try:
                     minutos, segundos = map(int, self.estadoTrabajo.split(":"))
                 except Exception:
                     minutos, segundos = 0, 0
                 self.segundos = minutos * 60 + segundos
                 self.label0.setText(f"{minutos:02}:{segundos:02}")
-
+    
     # Detiene o reanuda el temporizador
     def Detener(self):
         if self.timer.isActive():
             self.timer.stop()
         else:
             self.timer.start(1000)
+
+    def sonidoInicioDescanso(self):
+        self.sonido0.play()
      
+    def sonidoFinal(self):
+        self.sonido1.play()
+
 app = QApplication(sys.argv)
 windows = mainWindow()
 windows.show()
