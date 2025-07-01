@@ -8,13 +8,19 @@ class mainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Timer type pomodoro")
-        self.setGeometry(100, 100, 1000, 650)
+        self.setGeometry(100, 100, 500, 450)
         self.screen0()
 
+        #inicializamos los sonidos
+        #Sonido uno
         self.sonido0 = QSoundEffect()
+        #les agregamos la ruta del sonido 1
         self.sonido0.setSource(QUrl.fromLocalFile("/home/idksa_script/Codigo/Proyectos/Pomodoro/usr/bin/Sounds/772763__jerryberumen__user-interface-fanfare-end-reached-success-victory-finished.wav"))
+        #Sonido dos
         self.sonido1 = QSoundEffect()
+        #agregamos la ruta del sonido 2
         self.sonido1.setSource(QUrl.fromLocalFile("/home/idksa_script/Codigo/Proyectos/Pomodoro/usr/bin/Sounds/613876__theplax__digital-alarm-clock.wav"))
+        #El volumen de los sonidos
         self.sonido0.setVolume(1.0)
         self.sonido1.setVolume(1.0)
 
@@ -42,7 +48,7 @@ class mainWindow(QMainWindow):
         self.ingresar2.setStyleSheet("color: white;")
         # QLineEdit para ingresar la cantidad de repeticiones
         self.ingresar3 = QLineEdit()
-        self.ingresar3.setPlaceholderText("Veces a repetir (4)")
+        self.ingresar3.setPlaceholderText("Veces a repetir")
         self.ingresar3.setStyleSheet("color: white;")
 
         # Agregamos los QLineEdit al layout
@@ -53,6 +59,7 @@ class mainWindow(QMainWindow):
 
         # Botón para iniciar el temporizador
         self.boton0 = QPushButton("Iniciar")
+        self.boton0.setStyleSheet("color: white;")
         self.boton0.clicked.connect(self.screen1)
         self.boton0.clicked.connect(self.iniciar)
         principalLayout.addWidget(self.boton0)
@@ -71,7 +78,8 @@ class mainWindow(QMainWindow):
 
         # Label para mostrar el tiempo
         self.label0 = QLabel("00:00")
-        self.label0.setStyleSheet("color:white;")
+        self.label0.setStyleSheet("color:white; font-size: 48px;")
+        self.label0.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(self.label0)
 
         # Layout para los botones de control
